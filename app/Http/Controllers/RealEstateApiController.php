@@ -210,6 +210,7 @@ class RealEstateApiController extends Controller
                 'message' => 'Invalid size range: "min_size" cannot be greater than "max_size". Please fix the values.',
             ], 422);
         }
+
         // Ensure size_unit is provided if size_min or size_max is sent and validate its value
         if (($sizeMin || $sizeMax) && (!$sizeUnit || !in_array($sizeUnit, ['SQFT', 'm2']))) {
             return response()->json([
@@ -255,15 +256,46 @@ class RealEstateApiController extends Controller
             $query->where('price', '<=', $priceMax);
         }
 
-        // Execute the query and get the results
-        $properties = $query->get();
+        // Query the database and fetch the results
+        $properties = $query->select('*')
+            ->selectRaw("ST_AsText(location) as location_text") // Get readable location
+            ->get();
 
-        if ($properties ->isEmpty()) {
+        // Check if properties exist
+        if ($properties->isEmpty()) {
             return response()->json([
                 'message' => 'No properties found matching the search criteria.',
                 'data' => []
             ], 404);
         }
+
+        // Format the properties
+        $properties = $properties->toArray();
+
+        // Format each property and ensure UTF-8 encoding
+        $properties = array_map(function ($property) {
+            // Ensure the location is correctly parsed
+            if (isset($property['location_text']) && $property['location_text'] !== null) {
+                $locationText = $property['location_text'];
+
+                // Extract the latitude and longitude
+                if (preg_match('/POINT\(([-\d.]+) ([-\d.]+)\)/', $locationText, $matches)) {
+                    $property['location'] = [
+                        'latitude' => $matches[2], // Latitude
+                        'longitude' => $matches[1] // Longitude
+                    ];
+                } else {
+                    $property['location'] = null;
+                }
+            }
+
+            // Ensure all string values are UTF-8 encoded
+            return array_map(function ($value) {
+                return is_string($value) ? utf8_encode($value) : $value;
+            }, $property);
+        }, $properties);
+
+        // Return the response with properly encoded data
         return response()->json([
             'message' => 'Properties found matching the search criteria.',
             'data' => $properties
@@ -281,11 +313,16 @@ class RealEstateApiController extends Controller
         // Convert radius to meters for MySQL query
         $radiusInMeters = $radius * 1000;
 
-        // Query the real_estates table for properties within the specified radius
-        $properties = RealEstate::select('*')
+        // Build the query to fetch properties within the specified radius
+        $query = RealEstate::select('*')
             ->selectRaw("ST_AsText(location) as location_text") // Get readable location as text
-            ->whereRaw("ST_Distance_Sphere(location, POINT(?, ?)) <= ?", [$userLon, $userLat, $radiusInMeters])
-            ->get();
+            ->whereRaw("ST_Distance_Sphere(location, POINT(?, ?)) <= ?", [$userLat, $userLon, $radiusInMeters]);
+
+        // Log the raw SQL query for debugging purposes
+        Log::info("Raw SQL: " . $query->toSql());
+
+        // Execute the query and get the result as a collection
+        $properties = $query->get();
 
         Log::info("test"); // Log it
 
