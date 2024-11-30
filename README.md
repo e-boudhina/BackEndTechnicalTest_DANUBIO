@@ -13,13 +13,8 @@
 - I carefully tested them in sequence to ensure that they work.
 
 1. git clone https://github.com/e-boudhina/FullStackTechnicalTest_DANUBIO.git
-2. cd dashboard
+2. cd FullStackTechnicalTest_DANUBIO
 3. composer install
-4. composer self-update ( If you are running a composer version < 2 you will receive A Runtime Exception : In order to use the Auth::routes() method, please install the laravel/ui package).
-   The issue will persist | unless you update composer it will not be solved
-5. composer require laravel/ui
-6. php artisan ui bootstrap
-7. npm install && npm run dev
 8. cp .env.example .env
 9. php artisan key:generate
 11. php artisan migrate --seed
