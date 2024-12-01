@@ -304,7 +304,7 @@ class RealEstateApiController extends Controller
 
     public function searchByLocationAndRadius(Request $request)
     {
-        Log::info("test"); // Log it
+        Log::info("Inside ===> searchByLocationAndRadius - Start<===");
 
         $userLat = $request->input('lat'); // User's latitude
         $userLon = $request->input('lon'); // User's longitude
@@ -313,16 +313,11 @@ class RealEstateApiController extends Controller
         // Convert radius to meters for MySQL query
         $radiusInMeters = $radius * 1000;
 
-        // Build the query to fetch properties within the specified radius
-        $query = RealEstate::select('*')
-            ->selectRaw("ST_AsText(location) as location_text") // Get readable location as text
-            ->whereRaw("ST_Distance_Sphere(location, POINT(?, ?)) <= ?", [$userLat, $userLon, $radiusInMeters]);
-
-        // Log the raw SQL query for debugging purposes
-        Log::info("Raw SQL: " . $query->toSql());
-
-        // Execute the query and get the result as a collection
-        $properties = $query->get();
+        // Query the real_estates table for properties within the specified radius
+        $properties = RealEstate::select('*')
+            ->selectRaw("ST_AsText(location) as location_text") // Add readable location format
+            ->whereRaw("ST_Distance_Sphere(location, POINT(?, ?)) <= ?", [$userLon, $userLat, $radiusInMeters])
+            ->get();
 
         Log::info("test"); // Log it
 
@@ -338,12 +333,10 @@ class RealEstateApiController extends Controller
 
         // Format each property, especially the location field
         $properties = array_map(function ($property) {
-            // Check if the location field exists and is not null
+            // Check if the location_text field exists and is not null
             if (isset($property['location_text']) && $property['location_text'] !== null) {
-                $locationText = $property['location_text'];
-
                 // If the location is a spatial point (e.g., POINT(lon lat)), extract latitude and longitude
-                if (preg_match('/POINT\(([-\d.]+) ([-\d.]+)\)/', $locationText, $matches)) {
+                if (preg_match('/POINT\(([-\d.]+) ([-\d.]+)\)/', $property['location_text'], $matches)) {
                     $property['location'] = [
                         'latitude' => $matches[2], // Latitude
                         'longitude' => $matches[1] // Longitude
@@ -363,7 +356,7 @@ class RealEstateApiController extends Controller
             }, $property);
         }, $properties);
 
-        Log::info($properties); // Log the formatted properties
+        Log::info("Inside ===> searchByLocationAndRadius - E <===");
 
         // Return the response with the properly encoded data
         return response()->json([
@@ -371,6 +364,8 @@ class RealEstateApiController extends Controller
             'data' => $properties
         ], 200);
     }
+
+
 
 
 }
