@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Get all  real estate properties
 Route::get('/realestate', [RealEstateApiController::class, 'index'])->name('realestate.index');
 
 // Store a new real estate property
@@ -27,7 +28,11 @@ Route::put('/realestate/{id}', [RealEstateApiController::class, 'update']); // P
 // Delete an existing real estate property
 Route::delete('/realestate/{id}', [RealEstateApiController::class, 'destroy']); // DELETE /api/realestate/{id}
 
+//Search URLs
+// Search using type (House or Apartment), address, size (in SQFT or m2), number of bedrooms,
 Route::get('/realestate/search', [RealEstateApiController::class, 'search']); // Search real estates
+
+//Search with Latitude, longitude coordinates and Radius
 Route::get('/realestate/searchByLocationAndRadius', [RealEstateApiController::class, 'searchByLocationAndRadius']); // Search real estates
 
 
