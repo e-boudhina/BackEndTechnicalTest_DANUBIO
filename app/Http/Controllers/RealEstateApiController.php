@@ -82,8 +82,8 @@ class RealEstateApiController extends Controller
                 'size_unit' => 'required|in:SQFT,m2', // Size unit must be either 'SQFT' or 'm2'
                 'bedrooms' => 'required|integer',
                 'location' => 'required|array', // Ensure 'location' is an array
-                'location.lat' => 'required|numeric', // Validate latitude
-                'location.lon' => 'required|numeric', // Validate longitude
+                'location.lat' => 'required|numeric|between:-90,90', // Validate latitude
+                'location.lon' => 'required|numeric| between:-180,180', // Validate longitude
                 'price' => 'required|numeric',
             ], [
                     // Custom error messages for validation
