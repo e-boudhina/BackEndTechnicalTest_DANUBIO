@@ -139,7 +139,6 @@ class RealEstateApiController extends Controller
     // Update an existing real estate property
     public function update(Request $request, $id)
     {
-
         // Find the property by ID
         $property = RealEstate::find($id);
 
@@ -154,16 +153,55 @@ class RealEstateApiController extends Controller
             'address' => 'required|string',
             'size' => 'required|numeric',
             'bedrooms' => 'required|integer',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
             'price' => 'required|numeric',
+            'location' => 'required|array', // Ensure 'location' is an array
+            'location.latitude' => 'required|numeric|between:-90,90', // Validate latitude
+            'location.longitude' => 'required|numeric|between:-180,180', // Validate longitude
         ]);
 
-        // Update the property with the validated data
-        $property->update($validated);
+        // Manually validate the 'size_unit' only if it is present
+        $size_unit = $request->input('size_unit'); // If not provided, this will be null
 
-        return response()->json(['message' => 'Property updated successfully!', 'data' => $property]);
+        if ($size_unit && !in_array($size_unit, ['SQFT', 'm2'])) {
+            return response()->json(['message' => 'Invalid size unit. It must be either "SQFT" or "m2".'], 400);
+        }
+        // Extract latitude and longitude from validated data
+        $longitude = $validated['location']['longitude'];
+        $latitude = $validated['location']['latitude'];
+
+        // Update the location as a POINT (longitude, latitude)
+        $property->location = DB::raw('POINT(' . $longitude . ',' . $latitude . ')');
+
+        // Update the property with the validated data (including size_unit)
+        $property->type = $validated['type'];
+        $property->address = $validated['address'];
+        $property->size = $validated['size'];
+        $property->size_unit = $size_unit; // Set size_unit to a default value if missing
+        $property->bedrooms = $validated['bedrooms'];
+        $property->price = $validated['price'];
+
+        // Save the updated property to the database
+        $property->save();
+
+        // Return the updated property in the response
+        return response()->json([
+            'message' => 'Property updated successfully!',
+            'data' => [
+                'type' => $property->type,
+                'address' => $property->address,
+                'size' => $property->size,
+                'size_unit' => $property->size_unit,
+                'bedrooms' => $property->bedrooms,
+                'price' => $property->price,
+                'location' => [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ],
+            ]
+        ]);
     }
+
+
 
     /**
      * Remove the specified resource from storage.
