@@ -20,7 +20,7 @@ git clone https://github.com/e-boudhina/BackEndTechnicalTest_DANUBIO.git
 ```
 ### 2.  Navigate to the project directory:
  ```
-cd FullStackTechnicalTest_DANUBIO
+cd BackEndTechnicalTest_DANUBIO
  ```
 ### 3.  Install composer:
  ```
