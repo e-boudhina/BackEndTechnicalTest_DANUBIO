@@ -16,7 +16,7 @@
 
 ### 1. Clone the repository:
  ```
-git clone https://github.com/e-boudhina/FullStackTechnicalTest_DANUBIO.git
+git clone https://github.com/e-boudhina/BackEndTechnicalTest_DANUBIO.git
 ```
 ### 2.  Navigate to the project directory:
  ```
