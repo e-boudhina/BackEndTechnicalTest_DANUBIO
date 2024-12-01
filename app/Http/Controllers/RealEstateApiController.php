@@ -310,6 +310,20 @@ class RealEstateApiController extends Controller
         $userLon = $request->input('lon'); // User's longitude
         $radius = $request->input('radius'); // Radius in kilometers
 
+        //adding basic validation
+        // Validate latitude and longitude ranges
+        if ($userLat < -90 || $userLat > 90) {
+            return response()->json([
+                'message' => 'Invalid latitude value. Latitude must be between -90 and 90.',
+            ], 400);
+        }
+
+        if ($userLon < -180 || $userLon > 180) {
+            return response()->json([
+                'message' => 'Invalid longitude value. Longitude must be between -180 and 180.',
+            ], 400);
+        }
+
         // Convert radius to meters for MySQL query
         $radiusInMeters = $radius * 1000;
 
