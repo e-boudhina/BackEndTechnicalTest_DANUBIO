@@ -112,7 +112,7 @@ class RealEstateSeeder extends Seeder
             'size_unit' => 'm2',
             'bedrooms' => 1,
             'price' => 400000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(35.6595 139.7005)')")
+            'location' => DB::raw("ST_GeomFromText('POINT(139.7005 35.6595)')")
         ]);
 
         RealEstate::create([
@@ -122,7 +122,7 @@ class RealEstateSeeder extends Seeder
             'size_unit' => 'SQFT',
             'bedrooms' => 4,
             'price' => 1200000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(37.3318 -122.0312)')")
+            'location' => DB::raw("ST_GeomFromText('POINT(-122.0312 37.3318)')")
         ]);
 
         RealEstate::create([
@@ -132,7 +132,7 @@ class RealEstateSeeder extends Seeder
             'size_unit' => 'SQFT',
             'bedrooms' => 2,
             'price' => 800000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(37.4220 -122.0841)')")
+            'location' => DB::raw("ST_GeomFromText('POINT(-122.0841 37.4220)')")
         ]);
 
         RealEstate::create([
@@ -152,27 +152,28 @@ class RealEstateSeeder extends Seeder
             'size_unit' => 'SQFT',
             'bedrooms' => 1,
             'price' => 550000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(34.1016 -118.3269)')")
+            'location' => DB::raw("ST_GeomFromText('POINT(-118.3269 34.1016)')")
         ]);
 
         RealEstate::create([
             'type' => 'House',
-            'address' => '1600 Pennsylvania Avenue, Washington, DC, USA',
-            'size' => 4500.0, // SQFT
+            'address' => '35 Hudson Yards, New York, NY, USA',
+            'size' => 5500.0, // SQFT
             'size_unit' => 'SQFT',
-            'bedrooms' => 6,
-            'price' => 3500000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(38.8977 -77.0365)')")
+            'bedrooms' => 4,
+            'price' => 10000000.00,
+            'location' => DB::raw("ST_GeomFromText('POINT(-74.0022 40.7590)')")
         ]);
+
 
         RealEstate::create([
             'type' => 'Apartment',
-            'address' => 'Fisherman’s Wharf, San Francisco, CA, USA',
+            'address' => 'Fisherman\'s Wharf, San Francisco, CA, USA',
             'size' => 1000.0, // SQFT
             'size_unit' => 'SQFT',
             'bedrooms' => 2,
             'price' => 950000.00,
-            'location' => DB::raw("ST_GeomFromText('POINT(37.8080 -122.4177)')")
+            'location' => DB::raw("ST_GeomFromText('POINT(-122.4177 37.8080)')")
         ]);
 
         RealEstate::create([
